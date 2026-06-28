@@ -1,7 +1,10 @@
 import json
 from http.cookiejar import MozillaCookieJar
 from http.cookies import Morsel
-
+import hashlib
+import secrets
+import time as _time
+from urllib.parse import urlparse
 from aiohttp import ClientSession, CookieJar
 
 
@@ -44,10 +47,7 @@ class ParsingActivator:
         # live in data.json under OnlyFans.activation and rotate upstream every ~1–3 weeks.
         # If "Please refresh the page" keeps firing after activation, refresh them from:
         #   https://raw.githubusercontent.com/DATAHOARDERS/dynamic-rules/main/onlyfans.json
-        import hashlib
-        import secrets
-        import time as _time
-        from urllib.parse import urlparse
+
 
         act = site.activation
         static_param = act["static_param"]
@@ -149,7 +149,7 @@ def import_aiohttp_cookies(cookiestxt_filename):
 
     cookies_list = []
     for domain in cookies_obj._cookies.values():  # type: ignore[attr-defined]
-        for key, cookie in list(domain.values())[0].items():
+        for key, cookie in next(iter(domain.values())).items():
             c: Morsel = Morsel()
             c.set(key, cookie.value, cookie.value)
             c["domain"] = cookie.domain
